@@ -1,115 +1,75 @@
-<h1 align="center">Production Scheduling for Claude Code</h1>
+# Production Scheduling for Claude Code
 
-<p align="center">
-  <strong>The open-source production scheduling desk that is just a database and Claude Code.</strong>
-</p>
+Fit the work into the machine time and operator time you actually have. Keep the reasons behind late orders in a database you own.
 
-<p align="center">
-  Created by <a href="https://www.enterprisedna.co"><strong>Enterprise DNA</strong></a>. Free and open source. Works with Claude Code, Codex, OpenCode or Cursor.
-</p>
+| Do it yourself | We customise it | We run it for you |
+|---|---|---|
+| Free, MIT licensed. Start with fictional records. | Your shifts, routes, material rules and SkyPlanner data mapping. | Installed through Omni by Enterprise DNA. One setup fee, then a retainer. |
+| [Quick start](#quick-start) | [Get your version built](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=skyplanner&utm_medium=customise) | [Book a call](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=skyplanner&utm_medium=managed) |
 
-<!-- three-doors -->
-<table align="center">
-  <tr>
-    <td align="center"><strong>Do it yourself</strong><br/>Clone it, run it, own it. Free, MIT.<br/><a href="#quick-start">Quick start</a></td>
-    <td align="center"><strong>We customise it</strong><br/>Your fields, your rules, your SkyPlanner data brought across.<br/><a href="https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=skyplanner">Book a call</a></td>
-    <td align="center"><strong>We run it for you</strong><br/>Installed, connected and operated inside Omni. Setup fee, then a retainer.<br/><a href="https://enterprisedna.co/omni/instead-of/skyplanner?utm_source=github&utm_medium=readme&utm_campaign=skyplanner">How it works</a></td>
-  </tr>
-</table>
-
-<p align="center">
-  <a href="#what-is-this">What is this</a> &bull;
-  <a href="#why-no-front-end">Why no front end</a> &bull;
-  <a href="#quick-start">Quick start</a> &bull;
-  <a href="#the-commands">Commands</a> &bull;
-  <a href="#instead-of-skyplanner">Instead of SkyPlanner</a> &bull;
-  <a href="#want-it-installed-and-run-for-you">Installed for you</a> &bull;
-  <a href="#license">License</a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Node-20+-339933?style=flat-square" alt="Node 20+" />
-  <img src="https://img.shields.io/badge/PostgreSQL-any-336791?style=flat-square" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/PGlite-embedded-3ecf8e?style=flat-square" alt="PGlite" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
-</p>
-
----
-
-## What is this
-
-Production Scheduling for Claude Code does the job you pay SkyPlanner for, as a Postgres database and a set of agent commands. There is no web front end. You open the folder in [Claude Code](https://claude.com/claude-code) (or Codex, OpenCode, Cursor: see `AGENTS.md`) and ask for what you want in plain language. It runs the right query, and it can answer questions the SkyPlanner dashboard cannot.
-
-<!-- TODO(author): the annual bill. One sentence: what a 10 to 50 person business typically pays SkyPlanner per year, all in, with a source. -->
-
-Want the same thing with a web front end, or built on a different stack? That is a customisation, and it is exactly what Enterprise DNA does: [book a call](https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=skyplanner).
-
-<!-- TODO(author): two or three sentences on what this specific product covers and who it is for. -->
-
-## Why no front end
-
-- The front end was only ever there because the database was hard to talk to. That is no longer true.
-- Your data sits in plain Postgres tables you own. Any tool can read them. No export, no lock-in.
-- No seats, no tiers, no add-ons. Read [docs/why-no-front-end.md](docs/why-no-front-end.md) for the honest trade-offs too.
+For factory planners. Works with Claude Code, Codex, OpenCode or Cursor. This base is a deterministic planning desk with daily shifts and explicit resource pairs. It is not a reproduction of SkyPlanner's optimisation engine. [Scope and sources](docs/research.md).
 
 ## Quick start
 
-Sixty seconds, no database install (an embedded Postgres runs inside Node):
+Node 20.6 or later, Windows or Linux:
 
 ```bash
-git clone https://github.com/Enterprise-DNA-OS/production-scheduling-for-claude-code.git
-cd production-scheduling-for-claude-code
 npm install
 npm run demo
+npm test
+npm run schedule -- plan --json
+npm run view
+npm run docs
 ```
 
-Then open the folder in Claude Code and type a slash command. <!-- TODO(author): name the first command to try. -->
+Local PGlite stores data in .data/db. DATABASE_URL selects Postgres. Use a fresh database for real work: migrate, import, verify. Do not seed fictional data into a business database. The demo includes overdue brackets, a two-step frame route, a held lathe, missing stock and a planned press shutdown. Seed dates are relative to first use and repeated seeds preserve changes.
 
-### Use it with your own Postgres or Supabase
+## Five weekly jobs
 
-Copy `.env.example` to `.env`, set `DATABASE_URL`, then `npm run migrate`. Same commands, shared data, no per-seat fee.
+1. /dispatch: allocate both machine and operator minutes, without double booking.
+2. /late-orders: explain blocked work and proposed late finishes.
+3. /capacity: see the backlog against recorded working minutes.
+4. /compliance: check holds, review evidence and material readiness.
+5. /weekly-review: combine the proposed plan, resource load and checks.
 
-## The commands
+The scheduler orders batches by earliest deadline, then respects each batch's operation sequence. It splits work across weekday shifts starting at 08:00. Defaults are 480 minutes per resource, configurable downwards. Shutdowns, missing evidence and expired reviews remove capacity. This heuristic is transparent, not an optimality guarantee. A proposed schedule does not release machinery or confirm delivery. [CLI](docs/cli.md).
 
-<!-- TODO(author): a table of the slash commands in .claude/commands and what each one does. -->
+## Ten questions to ask from your own records
 
-| Command | What it does |
-|---|---|
-| `/...` | ... |
+These combine your local rules and evidence. They are not claims that SkyPlanner cannot answer similar questions.
 
-## Instead of SkyPlanner
+1. Which overdue batch gets the shared milling cell first? (plan)
+2. Which press step must wait for milling to finish? (dispatch)
+3. Which orders cannot run because a resource is held? (late-orders)
+4. Which material checks still block production? (compliance)
+5. Which operator has more queued minutes than a working day? (capacity)
+6. Which operations have deadlines before their ready time? (compliance)
+7. Which machine reviews are overdue? (compliance)
+8. What happens to delivery when tomorrow is a shutdown? (plan)
+9. Which original imported row supplied an operation? (record)
+10. Who recorded a hold release or material confirmation? (history)
 
-<!-- TODO(author): how to bring data across from SkyPlanner; link docs/replace-skyplanner.md -->
+## Your first hour: ten things to ask for
 
-## Architecture
+1. Register our machines and their shift minutes.
+2. Register our operators and competence evidence.
+3. Import our planning sheet in a test run.
+4. Match the imported counts to the source.
+5. Confirm material readiness for one batch.
+6. Record a machine shutdown tomorrow.
+7. Show the proposed dispatch slots.
+8. Explain every blocked or late order.
+9. Put our business name and logo in brand.json.
+10. Add our second-shift rule through /customise.
 
-```
-production-scheduling-for-claude-code/
-  CLAUDE.md                 how the operator wants this run (routing table + house rules)
-  AGENTS.md                 the same, for Codex / OpenCode / Cursor / Gemini CLI
-  .claude/commands/         the slash commands
-  scripts/                  the CLI the commands drive
-  scripts/lib/db.mjs        one adapter: DATABASE_URL (pg) or embedded PGlite
-  supabase/migrations/      plain SQL schema
-  supabase/seed.sql         demo data
-  docs/                     the thesis and the migration guide
-```
+## Move from SkyPlanner
 
-## Built for coding agents
+`npm run schedule -- import skyplanner imports/schedule.csv --actor=Planner --dry-run` validates the vendor's published production schedule template format in one command. Repeat without --dry-run to load it. This format is a public planning template, not a verified one-click account export. Full account history requires mapping from the documented API or your ERP exports. New resources remain held and materials unconfirmed until a person checks them. [Switching guide](docs/replace-skyplanner.md).
 
-The database, CLI and command recipes work with Claude Code, Codex, OpenCode or Cursor. Ask your coding agent for a new command and have it implement and test the change against the same records.
+## Outputs and operation
 
-## Contributing
+npm run docs creates routing cards and resource capacity reviews as branded HTML. npm run view creates the production-week snapshot. /draft-dispatch writes a local proposal, never sends. Export writes all five record sets with source payloads and immutable history to a new JSON file. This is an interchange snapshot, not automatic restore; back up the database and evidence files separately.
 
-Issues and pull requests are welcome. Keep the shape: plain SQL, a small CLI, a slash command per recurring job, no front end.
+npm test uses a temporary database and checks resource conflicts, route order, closures, holds, late work, atomic imports, repeated imports, history, HTML escaping and every CLI command. A manual workflow covers Linux and Windows. Postgres can be tested with a fresh TEST_DATABASE_URL. Public schema access is revoked. Shared deployment needs authenticated scoped roles and tested backups.
 
-## Want it installed and run for you?
-
-Enterprise DNA installs Production Scheduling for Claude Code for your business, migrates your SkyPlanner data, connects it to the rest of your tools, and runs it for you as part of **Omni**, our managed Command Center. One setup fee, then a monthly retainer.
-
-- Book a call: [enterprisedna.co/omni/book](https://enterprisedna.co/omni/book/?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=skyplanner)
-- Read more: [enterprisedna.co/omni/instead-of/skyplanner](https://enterprisedna.co/omni/instead-of/skyplanner?utm_source=github&utm_medium=readme&utm_campaign=skyplanner)
-
-## License
-
-MIT. Copyright (c) 2026 Enterprise DNA.
+MIT licensed. Not affiliated with SkyPlanner or Anthropic. Hosting and coding-agent costs are separate. [30 minutes with Sam](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=skyplanner&utm_medium=readme).

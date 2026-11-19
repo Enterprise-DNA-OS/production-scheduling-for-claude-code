@@ -1,0 +1,42 @@
+[
+  [
+    "Which overdue batch gets the shared milling cell first?",
+    "plan"
+  ],
+  [
+    "Which press step must wait for milling to finish?",
+    "dispatch"
+  ],
+  [
+    "Which orders cannot run because a resource is held?",
+    "late-orders"
+  ],
+  [
+    "Which material checks still block production?",
+    "compliance"
+  ],
+  [
+    "Which operator has more queued minutes than a working day?",
+    "capacity"
+  ],
+  [
+    "Which operations have deadlines before their ready time?",
+    "compliance"
+  ],
+  [
+    "Which machine reviews are overdue?",
+    "compliance"
+  ],
+  [
+    "What happens to delivery when tomorrow is a shutdown?",
+    "plan"
+  ],
+  [
+    "Which original imported row supplied an operation?",
+    "record"
+  ],
+  [
+    "Who recorded a hold release or material confirmation?",
+    "history"
+  ]
+]

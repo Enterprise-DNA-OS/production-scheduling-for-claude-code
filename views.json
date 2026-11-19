@@ -1,13 +1,20 @@
 [
   {
     "name": "week",
-    "title": "This week",
-    "subtitle": "Production Scheduling for Claude Code: what needs attention, rendered by npm run view",
+    "title": "Production week",
+    "subtitle": "Recorded backlog and checks. Run plan for a fresh proposal.",
     "sections": [
       {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "title": "Queued work by resource",
+        "sql": "select * from scheduling.capacity order by queued_minutes desc"
+      },
+      {
+        "title": "Overdue operations",
+        "sql": "select code,order_code,machine,operator,due_at from scheduling.overdue order by due_at"
+      },
+      {
+        "title": "Review before dispatch",
+        "sql": "select * from scheduling.compliance order by rule,record"
       }
     ]
   }

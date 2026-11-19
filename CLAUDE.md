@@ -1,43 +1,42 @@
 # Production Scheduling for Claude Code: operating instructions
 
-This file is the brain. Claude Code reads it at the start of every session. It says who this is for, how work gets done, and the one right way to do each recurring job.
+Business: fill in your business name. Operator: fill in your name and role. Priorities: feasible dispatch, traceable holds and clear delivery exceptions.
 
-## Who this is for
+Read docs/cli.md. Start each session with attention --json. The CLI is the only record-writing door. Never infer a material arrival, inspection, competence sign-off or completion. Read full records before changing them and list ambiguous matches instead of guessing.
 
-- **Business:** [YOUR BUSINESS]
-- **Operator:** [YOUR NAME], [your role]
-- **What matters most:** [the one or two outcomes you care about]
+## Routing
 
-Fill this in once. A worker with context knows. A worker without it guesses.
+- /resources: List machines and operators, their holds and evidence.
+- /operations: Read the ordered production route.
+- /capacity: Review queued minutes against daily resource capacity.
+- /compliance: Review safety evidence, holds and material-readiness checks.
+- /overdue: Find unfinished operations past their recorded deadline.
+- /closures: Read planned maintenance and leave dates.
+- /history: Read the change ledger and actor labels.
+- /plan: Propose a finite-capacity schedule from recorded inputs.
+- /dispatch: Prepare machine and operator work slots.
+- /late-orders: Find orders that finish late or cannot be placed.
+- /attention: Combine scheduling exceptions, checks and queued capacity.
+- /weekly-review: Review the production week using plan, capacity and compliance.
+- /record: Read one operation and its retained source row.
+- /add-resource: Register a held machine or operator.
+- /set-resource: Record capacity, review evidence and a hold decision.
+- /add-operation: Add an operation with its routing sequence and resource pair.
+- /set-operation: Confirm material readiness, correct dates or close an operation.
+- /close-day: Block a resource for maintenance or leave.
+- /log: Append a note to the operation history.
+- /import: Preview and import the SkyPlanner production schedule CSV format.
+- /export: Write all business records to a new JSON snapshot.
+- /draft-dispatch: Write a local dispatch proposal for human review.
+- /customise: add a field or planning rule through a migration and tests.
+- /new-view: add a read-only HTML view.
 
-## How to work
+## Rules
 
-1. **Take a brief, not a script.** The operator describes the outcome. You run the right command and present the answer.
-2. **Read before you write.** Before drafting anything about a record, read its full history first.
-3. **Plain language.** Short sentences. No filler. Numbers in tables.
-4. **Silent success, loud problems.** No play-by-play. Say what broke and what you did about it.
-5. **Stop at the line.** Anything that sends, deletes, or faces a customer waits for a yes in this session.
+Draft only. Never send messages, instruct machine controls or change an external system. Plans are proposals for a competent planner to review. Evidence checks do not certify safety or compliance. Actor labels record attribution; they are not authentication. Read docs/compliance.md before discussing rule results.
 
-## Routing table: one right way for each recurring job
+Use a fresh DATA_DIR or DATABASE_URL for business records. Default PGlite storage is .data/db and supports one process at a time. The scheduling schema is private, with RLS and no public grants. Shared use needs scoped credentials and access review. Never put secrets or private outputs in Git. Back up the database and evidence separately.
 
-| When the operator asks for... | Use this |
-|---|---|
-| <!-- TODO(author): one row per slash command --> | `/...` |
+Migrations live in supabase/migrations. Never edit an applied migration. Run npm test after changing code. views.json and documents.json are trusted local SELECT definitions. brand.json controls the business identity. All generated outputs are private local artifacts.
 
-If an ask fits nothing here, run the CLI directly (`npm run <cli> -- --help`) and then propose a new command for it.
-
-## Hard rules
-
-- Never send email or messages from here. Draft to `drafts/`, a person sends.
-- Never delete records without an explicit yes in this session. Prefer marking closed or archived.
-- Never invent a record. If a name is ambiguous, list the candidates and ask.
-- The database is the source of truth. If the answer is not in it, say so.
-
-## Where things live
-
-- `scripts/` the CLI. `scripts/lib/db.mjs` picks `DATABASE_URL` (Postgres, Supabase) or the embedded database in `.data/`.
-- `supabase/migrations/` the schema, plain SQL. `npm run migrate` applies it.
-- `.claude/commands/` the slash commands. Add one every time the same ask comes twice.
-- `docs/` the thesis and the guide for moving off SkyPlanner.
-
-Built by Enterprise DNA. Installed and run for you as part of Omni: https://enterprisedna.co/omni/instead-of/skyplanner
+Omni by Enterprise DNA: https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=skyplanner&utm_medium=agent

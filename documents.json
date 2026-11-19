@@ -1,11 +1,36 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
-    "file": "name",
+    "name": "routing-card",
+    "title": "Production routing card",
+    "for_each": "select min(id::text)::uuid id,order_code from scheduling.operations group by order_code",
+    "file": "order_code",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Operation route",
+        "note": "Planning record only. Confirm materials, competence and machine controls before work.",
+        "sql": "select code,sequence,machine,operator,setup_minutes,run_minutes,ready_at,due_at,status,material_ready,note from scheduling.operation_list where order_code=(select order_code from scheduling.operations where id=$1) order by sequence"
+      }
+    ]
+  },
+  {
+    "name": "capacity-review",
+    "title": "Resource capacity review",
+    "for_each": "select id,code from scheduling.resources",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Resource evidence",
+        "sql": "select code,name,kind,daily_minutes,hold,evidence,review_due from scheduling.resources where id=$1",
+        "layout": "record"
+      },
+      {
+        "title": "Planned shutdowns",
+        "sql": "select closed_on,reason from scheduling.closures where resource_id=$1 order by closed_on"
+      },
+      {
+        "title": "Assigned work",
+        "sql": "select code,order_code,setup_minutes,run_minutes,due_at,status from scheduling.operations where machine_id=$1 or operator_id=$1 order by due_at"
+      }
     ]
   }
 ]
