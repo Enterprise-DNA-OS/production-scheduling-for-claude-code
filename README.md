@@ -70,6 +70,6 @@ These combine your local rules and evidence. They are not claims that SkyPlanner
 
 npm run docs creates routing cards and resource capacity reviews as branded HTML. npm run view creates the production-week snapshot. /draft-dispatch writes a local proposal, never sends. Export writes all five record sets with source payloads and immutable history to a new JSON file. This is an interchange snapshot, not automatic restore; back up the database and evidence files separately.
 
-npm test uses a temporary database and checks resource conflicts, route order, closures, holds, late work, atomic imports, repeated imports, history, HTML escaping and every CLI command. A manual workflow covers Linux and Windows. Postgres can be tested with a fresh TEST_DATABASE_URL. Public schema access is revoked. Shared deployment needs authenticated scoped roles and tested backups.
+npm test uses a temporary database and checks resource conflicts, route order, closures, holds, late work, atomic imports, repeated imports, history, HTML escaping and every CLI command. A manual workflow covers Linux, Windows and Postgres 16. Postgres can be tested with a fresh TEST_DATABASE_URL. Public schema access is revoked. Shared deployment needs authenticated scoped roles and tested backups.
 
 MIT licensed. Not affiliated with SkyPlanner or Anthropic. Hosting and coding-agent costs are separate. [30 minutes with Sam](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=skyplanner&utm_medium=readme).
